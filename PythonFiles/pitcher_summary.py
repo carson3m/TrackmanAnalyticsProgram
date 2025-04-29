@@ -108,6 +108,8 @@ class PitcherSummary:
         canvas.draw()
         canvas_widget = canvas.get_tk_widget()
         canvas_widget.pack(fill='both', expand=True, padx=5, pady=5)
+        
+        plt.close(fig)
 
     def _plot_strike_zone(self, parent):
         if not all(col in self.filtered_df.columns for col in ['PlateLocSide', 'PlateLocHeight', self.pitch_type_col]):
@@ -149,3 +151,5 @@ class PitcherSummary:
         canvas.draw()
         canvas_widget = canvas.get_tk_widget()
         canvas_widget.pack(fill='both', expand=True, padx=5, pady=5)
+        
+        plt.close(fig)
