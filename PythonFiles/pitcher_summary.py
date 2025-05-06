@@ -6,9 +6,10 @@ import matplotlib.patches as patches
 import pandas as pd
 
 class PitcherSummary:
-    def __init__(self, df, pitcher_name):
+    def __init__(self, df, pitcher_name, on_back):
         self.df_all = df[df['Pitcher'] == pitcher_name]
         self.name = pitcher_name
+        self.on_back = on_back
         self.filtered_df = self.df_all.copy()
         self.pitch_type_col = 'AutoPitchType'
         self.checkbox_vars = {}
@@ -24,6 +25,8 @@ class PitcherSummary:
         self.plot_container.pack(fill='x', pady=10)
 
         self._update_plots()
+
+        tk.Button(parent, text='Back to Menu', command=self.on_back).pack(pady=10)
 
         return self.frame
 

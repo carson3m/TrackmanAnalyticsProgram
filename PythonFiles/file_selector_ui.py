@@ -25,7 +25,7 @@ class FileSelectorUI:
             self.display_pitcher_selection()
 
     def display_pitcher_selection(self):
-        from PythonFiles.pitcher_selection_ui import PitcherSelectionUI
+        from PythonFiles.player_selection_ui import PitcherSelectionUI
         pitcher_ui = PitcherSelectionUI(self.loader)
         pitcher_ui.launch(self.root)
 
