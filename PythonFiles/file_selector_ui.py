@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
-from PythonFiles.csv_data_loader import CSVDataLoader
+from csv_data_loader import CSVDataLoader
 
 class FileSelectorUI:
     def __init__(self):
@@ -23,11 +23,6 @@ class FileSelectorUI:
         if file_path:
             self.loader = CSVDataLoader(file_path)
             self.display_pitcher_selection()
-
-    def display_pitcher_selection(self):
-        from PythonFiles.player_selection_ui import PitcherSelectionUI
-        pitcher_ui = PitcherSelectionUI(self.loader)
-        pitcher_ui.launch(self.root)
 
     def run(self):
         self.root.mainloop()
