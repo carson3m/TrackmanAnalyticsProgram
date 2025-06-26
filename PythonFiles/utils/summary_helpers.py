@@ -68,3 +68,9 @@ def plot_pitch_type_bar(df, ax, pitch_type_col='AutoPitchType'):
     ax.set_xticklabels(counts.index, rotation=45)
     ax.set_title("Pitch Type Count")
     ax.set_ylabel("Count")
+    
+def is_pitch_in_strike_zone(x, z):
+    """Return True if pitch is in zone based on x/z location."""
+    return x is not None and z is not None and -0.83 <= x <= 0.83 and 1.5 <= z <= 3.5
+
+    
