@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-from utils.summary_helpers import get_pitch_type_column
+from PythonFiles.utils.summary_helpers import get_pitch_type_column
 
 
 class PlayerMetricsAnalyzer:
@@ -11,6 +11,9 @@ class PlayerMetricsAnalyzer:
         self.normalize_pitch_calls()
         self.rename_columns()
         self.pitch_type_col = self.get_pitch_type_column()
+        if self.pitch_type_col in self.df.columns:
+            self.df = self.df[self.df[self.pitch_type_col].notna() & (self.df[self.pitch_type_col].str.strip() != "")]
+
 
     def normalize_pitch_calls(self):
         pitchcall_map = {

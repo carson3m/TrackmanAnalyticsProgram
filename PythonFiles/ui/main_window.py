@@ -1,15 +1,13 @@
 
 from PyQt5.QtWidgets import QMainWindow, QStackedWidget, QPushButton, QVBoxLayout, QWidget
 from datetime import datetime
-from ui.player_selection_widget import PlayerSelectionWidget
-from ui.summary_widget import SummaryWidget
-from ui.umpire_accuracy_widget import UmpireAccuracyWidget
-from ui.live_summary_widget import LiveSummaryWidget
-from core.network.udp_listener import TrackmanUDPListener
-from core.data_buffer import LiveDataBuffer
-from core.context_manager import LiveContextManager
-from ui.pitcher_context_panel import PitcherContextPanel
-from core.classifier.pitch_classifier import classify_pitch
+from PythonFiles.ui.player_selection_widget import PlayerSelectionWidget
+from PythonFiles.ui.summary_widget import SummaryWidget
+from PythonFiles.ui.umpire_accuracy_widget import UmpireAccuracyWidget
+from PythonFiles.ui.live_summary_widget import LiveSummaryWidget
+from PythonFiles.core.session_manager import SessionManager
+from PythonFiles.ui.pitcher_context_panel import PitcherContextPanel
+from PythonFiles.core.classifier.pitch_classifier import classify_pitch
 
 from PyQt5.QtCore import QTimer
 import pandas as pd
@@ -26,15 +24,14 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.stack)
 
         if self.live:
-            # Live mode setup
-            self.live_buffer = LiveDataBuffer()
-            self.context_manager = LiveContextManager()
-            self.selection_widget = PlayerSelectionWidget(pd.DataFrame(), lambda *args, **kwargs: None, live=True)
+            self.session = SessionManager()
+            self.session.start_live_mode()
+
+            self.context_manager = self.session.get_context_manager()
+            self.live_buffer = self.session.get_buffer()
+
             self.pitcher_panel = PitcherContextPanel(self.context_manager)
             self.summary_widget = LiveSummaryWidget(self.context_manager)
-
-            self.udp_listener = TrackmanUDPListener(callback=self.on_new_pitch)
-            self.udp_listener.start()
 
             layout = QVBoxLayout()
             layout.addWidget(self.pitcher_panel)
@@ -49,6 +46,7 @@ class MainWindow(QMainWindow):
             self.timer.setInterval(200)
             self.timer.timeout.connect(self.update_summary)
             self.timer.start()
+
     
         else:
             # CSV mode setup
@@ -92,14 +90,20 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event):
         try:
-            if hasattr(self, 'udp_listener'):
-                self.udp_listener.stop()
+            if hasattr(self, 'session'):
+                self.session.stop()
             if hasattr(self, 'selection_widget') and hasattr(self.selection_widget, 'trackman_listener'):
                 self.selection_widget.trackman_listener.stop()
         except Exception as e:
             print(f"[Trackman] Shutdown error: {e}")
         super().closeEvent(event)
+        
+    def update_summary(self):
+        df = self.live_buffer.to_dataframe()
+        self.summary_widget.update(df)
 
+
+'''
     def on_new_pitch(self, pitch_json):
         from core.pitch_parser import parse_pitch_message
 
@@ -136,8 +140,5 @@ class MainWindow(QMainWindow):
 
         except Exception as e:
             print(f"[Trackman] General error during processing: {e}")
-
-    def update_summary(self):
-        df = self.live_buffer.to_dataframe()
-        self.summary_widget.update(df)
+'''
 

@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from ui.strike_zone_plotter import StrikeZonePlotter  # Your class lives here
+from PythonFiles.ui.strike_zone_plotter import StrikeZonePlotter  # Your class lives here
 import pandas as pd
 
 class LiveStrikeZonePlot(QWidget):

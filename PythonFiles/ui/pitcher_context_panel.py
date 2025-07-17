@@ -3,7 +3,7 @@
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QPushButton, QLineEdit, QRadioButton, QButtonGroup
 )
-from core.context_manager import LiveContextManager
+from PythonFiles.core.context_manager import LiveContextManager
 
 class PitcherContextPanel(QWidget):
     def __init__(self, context_manager: LiveContextManager):

@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QScrollArea
-from ui.live_metrics_panel import LiveMetricsPanel
-from ui.live_pitch_table import LivePitchTable
-from ui.live_strike_zone_plot import LiveStrikeZonePlot
+from PythonFiles.ui.live_metrics_panel import LiveMetricsPanel
+from PythonFiles.ui.live_pitch_table import LivePitchTable
+from PythonFiles.ui.live_strike_zone_plot import LiveStrikeZonePlot
 
 class LiveSummaryWidget(QWidget):
     def __init__(self, context_manager):

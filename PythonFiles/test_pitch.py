@@ -3,7 +3,7 @@ import json
 from datetime import datetime, timezone
 import uuid
 
-def send_simulated_trackman_broadcast(host="127.0.0.1", port=20998):
+def send_simulated_trackman_broadcast(host="192.168.68.103", port=20998):
     now_utc = datetime.now(timezone.utc).isoformat()
 
     packet = {
@@ -58,5 +58,10 @@ def send_simulated_trackman_broadcast(host="127.0.0.1", port=20998):
 
     message = json.dumps(packet).encode('utf-8')
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.sendto(message, (host, port))
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    sock.sendto(message, ("192.168.1.102", 20998))
+
     print("✅ Simulated TrackMan packet sent to port 20998.")
+
+if __name__ == "__main__":
+    send_simulated_trackman_broadcast()

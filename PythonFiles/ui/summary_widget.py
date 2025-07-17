@@ -8,11 +8,11 @@ from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from summary.visuals import plot_pitch_type_pie
-from core.player_metrics import PlayerMetricsAnalyzer
-from ui.strike_zone_plotter import StrikeZonePlotter
-from summary.export import export_summary_to_pdf
-from core.statistics import calculate_whiff_rate, calculate_strike_rate, calculate_zone_rate
+from PythonFiles.summary.visuals import plot_pitch_type_pie
+from PythonFiles.core.player_metrics import PlayerMetricsAnalyzer
+from PythonFiles.ui.strike_zone_plotter import StrikeZonePlotter
+from PythonFiles.summary.export import export_summary_to_pdf
+from PythonFiles.core.statistics import calculate_whiff_rate, calculate_strike_rate, calculate_zone_rate
 
 
 def get_pitch_type_column(df):
@@ -379,7 +379,7 @@ class SummaryWidget(QWidget):
         ax.set_aspect('equal', adjustable='box')
             # ✅ Set fixed limits
         ax.set_xlim(-3.5, 3.5)
-        ax.set_ylim(1.5, 6.5)
+        ax.set_ylim(0, 6.5)
         ax.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
         self.release_canvas.draw()
 

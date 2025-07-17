@@ -1,3 +1,6 @@
+from PythonFiles.core.pitch_uploader import upload_pitch
+
+
 def parse_pitch_message(msg, context_manager):
     try:
         pitch = msg.get("Pitch", {})
@@ -5,7 +8,7 @@ def parse_pitch_message(msg, context_manager):
         movement = pitch.get("Movement") or {}
         location = pitch.get("Location") or {}
 
-        return {
+        parsed_pitch_dict = {
             "play_id": msg.get("PlayId"),  # ✅ Include this
             "timestamp": msg.get("Time"),  # ✅ Optional but recommended
             "pitch_speed": pitch.get("Speed"),
@@ -25,6 +28,8 @@ def parse_pitch_message(msg, context_manager):
             "plate_loc_side": location.get("Side"),
             "pitcher": context_manager.pitcher_name
         }
+        upload_pitch(parsed_pitch_dict)
+        return parsed_pitch_dict
     except Exception as e:
         print(f"[LiveParser] ⚠️ Error parsing pitch: {e}")
         return None

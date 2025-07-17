@@ -2,6 +2,9 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, Ima
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import landscape, letter
 from PIL import Image as PILImage
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend
+
 import matplotlib.pyplot as plt
 import os
 import tempfile

@@ -1,0 +1,165 @@
+.select-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.select-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  width: 100%;
+  max-width: 800px;
+}
+
+.select-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.select-header h1 {
+  color: #333;
+  margin: 0 0 10px 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.select-header p {
+  color: #666;
+  margin: 0;
+  font-size: 16px;
+}
+
+.pitchers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.pitcher-card {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pitcher-card:hover {
+  border-color: #667eea;
+  background: #f0f4ff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.1);
+}
+
+.pitcher-card.selected {
+  border-color: #48bb78;
+  background: #f0fff4;
+  box-shadow: 0 8px 20px rgba(72, 187, 120, 0.2);
+}
+
+.pitcher-icon {
+  font-size: 32px;
+  margin-bottom: 15px;
+}
+
+.pitcher-card h3 {
+  color: #333;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.select-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.secondary-button {
+  padding: 14px 28px;
+  background: #e2e8f0;
+  color: #4a5568;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.secondary-button:hover {
+  background: #cbd5e0;
+}
+
+.primary-button {
+  padding: 14px 28px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.primary-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.primary-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.error-message {
+  background: #fee;
+  color: #c33;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  border: 1px solid #fcc;
+}
+
+.loading {
+  text-align: center;
+  color: #666;
+  font-size: 18px;
+  padding: 40px;
+}
+
+.no-pitchers {
+  text-align: center;
+  padding: 40px;
+}
+
+.no-pitchers p {
+  color: #666;
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  .select-card {
+    padding: 20px;
+  }
+  
+  .pitchers-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .select-actions {
+    flex-direction: column;
+  }
+} 

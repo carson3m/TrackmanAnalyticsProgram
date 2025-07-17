@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Select Pitcher</title>
+</head>
+<body>
+  <h1>Select a Team and Pitcher</h1>
+
+  <!-- Team dropdown -->
+  <label for="team-select">Team:</label>
+  <select id="team-select">
+    <option value="">-- Select a Team --</option>
+    {% for team in teams %}
+      <option value="{{ team }}">{{ team }}</option>
+    {% endfor %}
+  </select>
+
+  <!-- Pitcher dropdown -->
+  <label for="pitcher-select">Pitcher:</label>
+  <select id="pitcher-select">
+    <option value="">-- Select a Pitcher --</option>
+  </select>
+
+  <button id="submit-btn">Submit</button>
+
+  <script>
+    const teamSelect = document.getElementById('team-select');
+    const pitcherSelect = document.getElementById('pitcher-select');
+    const submitBtn = document.getElementById('submit-btn');
+
+    teamSelect.addEventListener('change', function () {
+      const team = teamSelect.value;
+      pitcherSelect.innerHTML = '<option>Loading...</option>';
+      fetch(`/api/team_pitchers?team=${encodeURIComponent(team)}`)
+        .then(response => response.json())
+        .then(data => {
+          pitcherSelect.innerHTML = '<option value="">-- Select a Pitcher --</option>';
+          data.forEach(pitcher => {
+            const option = document.createElement('option');
+            option.value = pitcher;
+            option.textContent = pitcher;
+            pitcherSelect.appendChild(option);
+          });
+        });
+    });
+
+    submitBtn.addEventListener('click', function () {
+      const team = teamSelect.value;
+      const pitcher = pitcherSelect.value;
+      if (team && pitcher) {
+        window.location.href = `/csv_summary?team=${encodeURIComponent(team)}&pitcher=${encodeURIComponent(pitcher)}`;
+      }
+    });
+  </script>
+</body>
+</html>

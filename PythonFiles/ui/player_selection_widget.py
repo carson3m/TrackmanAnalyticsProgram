@@ -6,8 +6,8 @@ from PyQt5.QtWidgets import (
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import pandas as pd
-from ui.strike_zone_plotter import StrikeZonePlotter
-from core.network.udp_listener import TrackmanUDPListener
+from PythonFiles.ui.strike_zone_plotter import StrikeZonePlotter
+from PythonFiles.core.network.udp_listener import TrackmanUDPListener
 import json
 
 def classify_pitch(location):

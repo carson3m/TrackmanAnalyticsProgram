@@ -2,7 +2,7 @@
 from PyQt5.QtWidgets import QApplication, QFileDialog
 import pandas as pd
 import sys
-from ui.main_window import MainWindow
+from PythonFiles.ui.main_window import MainWindow
 
 def launch_csv_mode():
     app = QApplication(sys.argv)

@@ -2,8 +2,8 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QTextEdit, QPushButton
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
-from core.player_metrics import PlayerMetricsAnalyzer
-from ui.strike_zone_plotter import plot_umpire_calls
+from PythonFiles.core.player_metrics import PlayerMetricsAnalyzer
+from PythonFiles.ui.strike_zone_plotter import plot_umpire_calls
 
 class UmpireAccuracyWidget(QWidget):
     def __init__(self, df, back_callback):

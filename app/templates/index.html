@@ -1,0 +1,69 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trackman App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background-color: #f0f2f5;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+        .button {
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #005bbb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #00449e;
+        }
+        .auth-info {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 14px;
+        }
+        .auth-info a {
+            margin-left: 15px;
+            color: #005bbb;
+            text-decoration: none;
+        }
+        .auth-info a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-info">
+        {% if current_user.is_authenticated %}
+            👋 Logged in as <strong>{{ current_user.username }}</strong> ({{ current_user.role }})
+            <a href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+            <a href="{{ url_for('login') }}">Login</a>
+        {% endif %}
+    </div>
+
+    <h1>⚾ Trackman Analytics</h1>
+
+    <div class="button-container">
+        <a href="/upload_csv" class="button">CSV Mode</a>
+        <a href="/live_mode" class="button">Live Mode</a>
+    </div>
+</body>
+</html>
