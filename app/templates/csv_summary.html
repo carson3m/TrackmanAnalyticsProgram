@@ -17,14 +17,6 @@
         <button type="submit" class="btn btn-primary mb-4">Download PDF Report</button>
     </form>
 
-    <!-- 🔢 Summary Metrics -->
-    <h3>Summary Metrics</h3>
-    <ul>
-        <li>Whiff Rate: {{ metrics.whiff_rate | round(1) }}%</li>
-        <li>Strike Rate: {{ metrics.strike_rate | round(1) }}%</li>
-        <li>Zone Rate: {{ metrics.zone_rate | round(1) }}%</li>
-    </ul>
-
     <!-- 📊 Per-Pitch-Type Table -->
     <h3>Per-Pitch-Type Metrics</h3>
     <div class="table-responsive">

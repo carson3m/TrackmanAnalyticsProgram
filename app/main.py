@@ -11,10 +11,13 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# CORS settings (allow frontend dev server to call API)
+# CORS settings - allow only production domains
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://moundvision.com",
+        "https://api.moundvision.com",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

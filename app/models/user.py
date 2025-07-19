@@ -12,7 +12,9 @@ class User(Base):
     role = Column(String, nullable=False)
 
     def verify_password(self, password: str) -> bool:
-        return pwd_context.verify(password, self.hashed_password)
+        # Ensure self.hashed_password is a string, not a column object
+        hashed = self.hashed_password if isinstance(self.hashed_password, str) else str(self.hashed_password)
+        return pwd_context.verify(password, hashed)
 
     @classmethod
     def hash_password(cls, password: str) -> str:

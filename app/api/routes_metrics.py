@@ -81,11 +81,18 @@ async def download_pdf(team: str, pitcher: str, user: User = Depends(require_coa
         ax.grid(True)
 
     def plot_release_points(ax):
-        for pitch_type, group in filtered_df.groupby(analyzer.get_pitch_type_column()):
-            ax.scatter(group["RelSide"], group["RelHeight"], label=pitch_type)
+        import numpy as np
+        group = filtered_df
+        if not isinstance(group, pd.DataFrame):
+            group = pd.DataFrame(group)
+        group = group.dropna(subset=["RelSide", "RelHeight"])
+        for pitch_type, group_type in group.groupby(analyzer.get_pitch_type_column()):
+            ax.scatter(group_type["RelSide"], group_type["RelHeight"], label=pitch_type)
         ax.set_xlabel("Horizontal Release Side (ft)")
         ax.set_ylabel("Vertical Release Height (ft)")
         ax.set_title("Release Points")
+        ax.set_xlim(-3.5, 3.5)
+        ax.set_ylim(1, 7)
         ax.legend()
         ax.grid(True)
 
@@ -113,6 +120,10 @@ async def get_pitch_data(team: str, pitcher: str, user: User = Depends(require_c
     if filtered_df.empty:
         raise HTTPException(status_code=404, detail="No data for specified team and pitcher.")
 
+    # Ensure filtered_df is a DataFrame
+    if not isinstance(filtered_df, pd.DataFrame):
+        filtered_df = pd.DataFrame(filtered_df)
+
     # Select columns needed for plots (add more as needed)
     columns = [
         'Pitcher', 'PitcherTeam', 'PitchType', 'TaggedPitchType', 'AutoPitchType',
@@ -121,5 +132,10 @@ async def get_pitch_data(team: str, pitcher: str, user: User = Depends(require_c
     ]
     # Only keep columns that exist in the DataFrame
     columns = [col for col in columns if col in filtered_df.columns]
-    pitch_data = filtered_df[columns].to_dict(orient="records")
+    pitch_data = []
+    data_for_dict = filtered_df[columns]
+    if not isinstance(data_for_dict, pd.DataFrame):
+        data_for_dict = pd.DataFrame(data_for_dict)
+    if hasattr(data_for_dict, 'to_dict'):
+        pitch_data = data_for_dict.to_dict(orient="records")
     return JSONResponse(content={"pitches": pitch_data})

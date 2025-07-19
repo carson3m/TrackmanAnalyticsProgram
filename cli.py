@@ -67,7 +67,8 @@ def reset_password(username: str):
         return
 
     new_password = input(f"Enter new password for '{username}': ")
-    user.hashed_password = User.hash_password(new_password)
+    # Use setattr to ensure correct assignment to the instance attribute
+    setattr(user, 'hashed_password', User.hash_password(new_password))
     db.commit()
     db.close()
 

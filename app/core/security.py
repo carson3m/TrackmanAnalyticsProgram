@@ -42,15 +42,14 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 
 def require_role(required_role: str):
     def role_checker(user: User = Depends(get_current_user)):
-        if user.role != required_role:
+        if getattr(user, 'role', None) != required_role:
             raise HTTPException(status_code=403, detail="Not authorized")
         return user
     return role_checker
 
 def require_any_role(allowed_roles: list[str]):
-    """Require user to have any of the specified roles"""
     def role_checker(user: User = Depends(get_current_user)):
-        if user.role not in allowed_roles:
+        if getattr(user, 'role', None) not in allowed_roles:
             raise HTTPException(
                 status_code=403, 
                 detail=f"Access denied. Required roles: {', '.join(allowed_roles)}"
