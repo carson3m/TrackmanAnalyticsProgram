@@ -15,7 +15,7 @@ import pandas as pd
 class MainWindow(QMainWindow):
     def __init__(self, df, live=False):
         super().__init__()
-        self.setWindowTitle("Trackman Analytics")
+        self.setWindowTitle("MoundVision Analytics")
         self.resize(1200, 900)
         self.df = df
         self.live = live

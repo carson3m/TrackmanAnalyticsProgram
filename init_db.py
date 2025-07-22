@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Database initialization script for Trackman Analytics API
+Database initialization script for MoundVision Analytics API
 """
 from app.models.database import engine, SessionLocal
 from app.models.user import User, Base

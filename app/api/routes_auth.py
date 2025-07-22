@@ -19,7 +19,14 @@ def login(user_login: UserLogin, db: Session = Depends(get_db)):
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token = create_access_token(data={"sub": user.username})
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {
+        "access_token": access_token, 
+        "token_type": "bearer",
+        "user": {
+            "username": user.username,
+            "role": user.role
+        }
+    }
 
 @router.post("/init-db")
 def initialize_database(db: Session = Depends(get_db)):
