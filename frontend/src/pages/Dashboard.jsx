@@ -16,11 +16,25 @@ const Dashboard = () => {
     navigate('/upload');
   };
 
+  const handleBestOfStats = () => {
+    navigate('/best-of');
+  };
+
+  const handleUmpireAccuracy = () => {
+    navigate('/umpire-accuracy');
+  };
+
+  const handleAdminPanel = () => {
+    navigate('/admin');
+  };
+
+  const isAdmin = user?.role === 'admin';
+
   return (
     <div className="dashboard-container">
       <nav className="dashboard-nav">
         <div className="nav-brand">
-          <h2>Trackman Analytics</h2>
+          <h2>MoundVision Analytics</h2>
         </div>
         <div className="nav-user">
           <span>Welcome, {user?.username}</span>
@@ -33,16 +47,54 @@ const Dashboard = () => {
       <main className="dashboard-main">
         <div className="dashboard-header">
           <h1>Analytics Dashboard</h1>
-          <p>Upload your Trackman data and generate comprehensive reports</p>
+          <p>Upload your CSV data and generate comprehensive reports</p>
         </div>
 
         <div className="dashboard-cards">
           <div className="dashboard-card">
             <div className="card-icon">📊</div>
             <h3>Upload CSV Data</h3>
-            <p>Upload your Trackman CSV file to begin analysis</p>
+            <p>Upload your CSV file to begin analysis</p>
             <button onClick={handleUploadCSV} className="card-button">
               Start Analysis
+            </button>
+          </div>
+
+          <div className="dashboard-card">
+            <div className="card-icon">🏆</div>
+            <h3>Best of Stats</h3>
+            <p>View top performers across different metrics and time periods</p>
+            <button onClick={handleBestOfStats} className="card-button">
+              View Best of Stats
+            </button>
+          </div>
+
+          <div className="dashboard-card">
+            <div className="card-icon">⚖️</div>
+            <h3>Umpire Accuracy</h3>
+            <p>Analyze umpire performance and call accuracy</p>
+            <button onClick={handleUmpireAccuracy} className="card-button">
+              Analyze Umpire Accuracy
+            </button>
+          </div>
+
+          {isAdmin && (
+            <div className="dashboard-card admin-card">
+              <div className="card-icon">👑</div>
+              <h3>Admin Panel</h3>
+              <p>Manage users and system settings</p>
+              <button onClick={handleAdminPanel} className="card-button admin-button">
+                Access Admin Panel
+              </button>
+            </div>
+          )}
+
+          <div className="dashboard-card">
+            <div className="card-icon">📱</div>
+            <h3>Social Media Generator</h3>
+            <p>Create a shareable stat graphic for your team or player</p>
+            <button onClick={() => navigate('/social-media-generator')} className="card-button">
+              Create Social Post
             </button>
           </div>
 
@@ -68,9 +120,12 @@ const Dashboard = () => {
         <div className="dashboard-info">
           <h3>Getting Started</h3>
           <ol>
-            <li>Click "Start Analysis" to upload your Trackman CSV file</li>
+            <li>Click "Start Analysis" to upload your CSV file (Trackman format supported)</li>
             <li>Select the team and pitcher you want to analyze</li>
             <li>View comprehensive metrics and download PDF reports</li>
+            <li>Use "Best of Stats" to see top performers across metrics</li>
+            <li>Analyze umpire accuracy with the Umpire Accuracy tool</li>
+            {isAdmin && <li>Access the Admin Panel to manage users and system settings</li>}
           </ol>
         </div>
       </main>

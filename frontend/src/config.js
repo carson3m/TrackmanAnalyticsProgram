@@ -9,6 +9,12 @@ export const API_ENDPOINTS = {
   METRICS_SUMMARY: `${API_BASE_URL}/api/metrics/summary`,
   METRICS_PITCHES: `${API_BASE_URL}/api/metrics/pitches`,
   METRICS_DOWNLOAD_PDF: `${API_BASE_URL}/api/metrics/download_pdf`,
+  METRICS_BEST_OF: `${API_BASE_URL}/api/metrics/best-of`,
+  METRICS_UMPIRE_ACCURACY: `${API_BASE_URL}/api/metrics/umpire-accuracy`,
+  METRICS_UMPIRE_ACCURACY_PLOT: `${API_BASE_URL}/api/metrics/umpire-accuracy-plot`,
+  ADMIN_USERS: `${API_BASE_URL}/api/admin/users`,
+  ADMIN_STATS: `${API_BASE_URL}/api/admin/stats`,
+  SOCIAL_GENERATE_GRAPHIC: `${API_BASE_URL}/api/social/generate-graphic`,
 };
 
 // Fallback URL for development

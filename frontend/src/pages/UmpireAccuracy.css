@@ -1,0 +1,291 @@
+.umpire-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.umpire-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.umpire-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.umpire-header h1 {
+  color: #333;
+  margin: 0 0 10px 0;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.umpire-header p {
+  color: #666;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.controls-section {
+  display: flex;
+  gap: 20px;
+  align-items: end;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.control-group label {
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.team-select,
+.pitcher-select {
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 16px;
+  background: white;
+  color: #333;
+  min-width: 200px;
+  transition: border-color 0.2s ease;
+}
+
+.team-select:focus,
+.pitcher-select:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.pitcher-select:disabled {
+  background: #f7fafc;
+  color: #a0aec0;
+  cursor: not-allowed;
+}
+
+.analyze-button {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  min-width: 180px;
+}
+
+.analyze-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(237, 137, 54, 0.3);
+}
+
+.analyze-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.accuracy-section {
+  margin-top: 40px;
+}
+
+.accuracy-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.accuracy-header h2 {
+  color: #333;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+}
+
+.filter-info {
+  color: #666;
+  font-size: 14px;
+  margin: 5px 0;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.metric-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  transition: transform 0.2s ease;
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+}
+
+.metric-card.primary {
+  border-left: 4px solid #667eea;
+}
+
+.metric-card.success {
+  border-left: 4px solid #48bb78;
+}
+
+.metric-card.warning {
+  border-left: 4px solid #ed8936;
+}
+
+.metric-card h3 {
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metric-value {
+  color: #333;
+  font-size: 24px;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+}
+
+.metric-card.primary .metric-value {
+  color: #667eea;
+}
+
+.metric-card.success .metric-value {
+  color: #48bb78;
+}
+
+.metric-card.warning .metric-value {
+  color: #ed8936;
+}
+
+.accuracy-details {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+}
+
+.accuracy-details h3 {
+  color: #333;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+}
+
+.accuracy-text {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.accuracy-text pre {
+  margin: 0;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #333;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.error-message {
+  background: #fee;
+  color: #c33;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  border: 1px solid #fcc;
+}
+
+.umpire-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.secondary-button {
+  padding: 14px 28px;
+  background: #e2e8f0;
+  color: #4a5568;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.secondary-button:hover {
+  background: #cbd5e0;
+}
+
+@media (max-width: 768px) {
+  .umpire-card {
+    padding: 20px;
+  }
+  
+  .controls-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .team-select,
+  .pitcher-select {
+    min-width: auto;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .umpire-header h1 {
+    font-size: 24px;
+  }
+  
+  .accuracy-header h2 {
+    font-size: 20px;
+  }
+  
+  .metric-card {
+    padding: 16px;
+  }
+  
+  .metric-value {
+    font-size: 20px;
+  }
+} 

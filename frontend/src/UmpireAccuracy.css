@@ -1,0 +1,30 @@
+/* Screenshot-friendly stat cards */
+.screenshot-metrics-grid .metric-card {
+  width: 90px;
+  flex: 0 0 auto;
+  padding: 0.3rem 0.15rem;
+  margin: 0 0.12rem;
+  font-size: 0.82rem;
+  border-radius: 8px;
+  box-shadow: none;
+}
+.screenshot-metrics-grid {
+  display: flex;
+  justify-content: center;
+  gap: 0.12rem;
+  margin-bottom: 0.5rem;
+}
+
+.screenshot-plot-section {
+  margin: 2rem auto 1rem auto;
+  max-width: 700px;
+  background: #f8f9fa;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  padding: 1.5rem 1rem 2rem 1rem;
+}
+
+.screenshot-plot-section img {
+  display: block;
+  margin: 0 auto;
+} 

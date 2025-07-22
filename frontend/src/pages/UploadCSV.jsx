@@ -89,7 +89,7 @@ const UploadCSV = () => {
       <div className="upload-card">
         <div className="upload-header">
           <h1>Upload CSV Data</h1>
-          <p>Upload your Trackman CSV file to begin analysis</p>
+          <p>Upload your CSV file to begin analysis</p>
         </div>
 
         {error && <div className="error-message">{error}</div>}
@@ -145,7 +145,7 @@ const UploadCSV = () => {
           <h4>File Requirements:</h4>
           <ul>
             <li>File must be in CSV format</li>
-            <li>Should contain Trackman data with columns like Pitcher, PitcherTeam, etc.</li>
+            <li>Should contain data in the Trackman CSV format (columns like Pitcher, PitcherTeam, etc. are supported)</li>
             <li>Maximum file size: 50MB</li>
           </ul>
         </div>

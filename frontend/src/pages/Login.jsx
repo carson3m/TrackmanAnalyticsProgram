@@ -31,7 +31,7 @@ const Login = () => {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <h1>Trackman Analytics</h1>
+          <h1>MoundVision Analytics</h1>
           <p>Sign in to access your baseball analytics dashboard</p>
         </div>
         
@@ -72,9 +72,9 @@ const Login = () => {
         </form>
         
         <div className="login-footer">
-          <p>Demo Credentials:</p>
-          <p><strong>Coach:</strong> Nate Kujawski / Potterup123</p>
-          <p><strong>Admin:</strong> Carson / 192837465</p>
+          <p>Need access? Contact Carson to request credentials or discuss a payment plan:</p>
+          <p><strong>Phone:</strong> <a href="tel:19162509640">(916) 250-9640</a></p>
+          <p><strong>Email:</strong> <a href="mailto:carsonmorton3@gmail.com">carsonmorton3@gmail.com</a></p>
         </div>
       </div>
     </div>

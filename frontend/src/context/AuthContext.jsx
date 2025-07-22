@@ -20,10 +20,19 @@ export const AuthProvider = ({ children }) => {
   // Check for existing token on app load
   useEffect(() => {
     const savedToken = localStorage.getItem('authToken');
+    const savedUser = localStorage.getItem('user');
+    
     if (savedToken) {
       setToken(savedToken);
       setIsAuthenticated(true);
-      // You could also validate the token here
+      
+      if (savedUser) {
+        try {
+          setUser(JSON.parse(savedUser));
+        } catch (error) {
+          console.error('Error parsing saved user:', error);
+        }
+      }
     }
     setLoading(false);
   }, []);
@@ -61,9 +70,10 @@ export const AuthProvider = ({ children }) => {
       const authToken = data.access_token;
       
       setToken(authToken);
-      setUser({ username });
+      setUser(data.user);
       setIsAuthenticated(true);
       localStorage.setItem('authToken', authToken);
+      localStorage.setItem('user', JSON.stringify(data.user));
       
       return { success: true };
     } catch (error) {
@@ -77,6 +87,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setIsAuthenticated(false);
     localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
   };
 
   const value = {

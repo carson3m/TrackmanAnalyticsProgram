@@ -161,6 +161,25 @@
   margin-bottom: 0.5rem;
 }
 
+.dashboard-card.admin-card {
+  border: 2px solid #e53e3e;
+  background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+}
+
+.dashboard-card.admin-card .card-icon {
+  background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+}
+
+.admin-button {
+  background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%) !important;
+}
+
+.admin-button:hover {
+  background: linear-gradient(135deg, #c53030 0%, #a52a2a 100%) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(229, 62, 62, 0.3);
+}
+
 @media (max-width: 768px) {
   .dashboard-nav {
     padding: 1rem;

@@ -97,6 +97,9 @@ const ViewReport = () => {
           throw new Error(errorData.detail || 'Failed to fetch pitch data');
         }
         const data = await response.json();
+        console.log('Received pitch data:', data.pitches);
+        console.log('Sample pitch object:', data.pitches[0]);
+        console.log('Available pitch type columns:', data.pitches.length > 0 ? Object.keys(data.pitches[0]).filter(key => key.toLowerCase().includes('pitch')) : []);
         setPitchData(data.pitches || []);
       } catch (error) {
         setPitchDataError('Failed to load pitch data.');
@@ -173,20 +176,6 @@ const ViewReport = () => {
         {metrics && (
           <>
             {/* Per-pitch metrics table (already present) */}
-            <div className="metrics-grid">
-              {Object.entries(metrics).map(([key, value]) => (
-                key !== 'per_pitch_metrics' && (
-                  <div key={key} className="metric-card">
-                    <h3>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</h3>
-                    <div className="metric-value">
-                      {typeof value === 'number' ? value.toFixed(2) : value}
-                    </div>
-                  </div>
-                )
-              ))}
-            </div>
-
-            {/* Per-pitch metrics table */}
             {Array.isArray(metrics.per_pitch_metrics) && metrics.per_pitch_metrics.length > 0 && (
               <div className="per-pitch-metrics-table-container">
                 <h2>Per-Pitch Type Metrics</h2>
@@ -224,15 +213,15 @@ const ViewReport = () => {
                 <ResponsiveContainer width="100%" height={350}>
                   <ScatterChart margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
                     <CartesianGrid />
-                    <XAxis type="number" dataKey="HorzBreak" name="Horizontal Break (in)" label={{ value: 'Horizontal Break (in)', position: 'insideBottom', offset: -5 }} />
-                    <YAxis type="number" dataKey="InducedVertBreak" name="Vertical Break (in)" label={{ value: 'Vertical Break (in)', angle: -90, position: 'insideLeft' }} />
+                    <XAxis type="number" dataKey="HorzBreak" name="Horizontal Break (in)" label={{ value: 'Horizontal Break (in)', position: 'insideBottom', offset: -5 }} domain={[-25, 25]} />
+                    <YAxis type="number" dataKey="InducedVertBreak" name="Vertical Break (in)" label={{ value: 'Vertical Break (in)', angle: -90, position: 'insideLeft' }} domain={[-25, 25]} />
                     <Tooltip cursor={{ strokeDasharray: '3 3' }} />
                     <Legend />
-                    {Array.from(new Set(pitchData.map(p => p.TaggedPitchType || p.AutoPitchType || p.PitchType))).filter(Boolean).map((type, idx) => (
+                    {Array.from(new Set(pitchData.map(p => p.AutoPitchType || 'Unknown'))).map((type, idx) => (
                       <Scatter
                         key={type}
                         name={type}
-                        data={pitchData.filter(p => (p.TaggedPitchType || p.AutoPitchType || p.PitchType) === type)}
+                        data={pitchData.filter(p => p.AutoPitchType === type)}
                         fill={['#8884d8', '#82ca9d', '#ff7300', '#ff0000', '#0088FE', '#00C49F', '#FFBB28', '#FF8042'][idx % 8]}
                         line={false}
                       />
@@ -253,15 +242,15 @@ const ViewReport = () => {
                 <ResponsiveContainer width="100%" height={350}>
                   <ScatterChart margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
                     <CartesianGrid />
-                    <XAxis type="number" dataKey="RelSide" name="Horizontal Release Side (ft)" label={{ value: 'Horizontal Release Side (ft)', position: 'insideBottom', offset: -5 }} />
-                    <YAxis type="number" dataKey="RelHeight" name="Vertical Release Height (ft)" label={{ value: 'Vertical Release Height (ft)', angle: -90, position: 'insideLeft' }} />
+                    <XAxis type="number" dataKey="RelSide" name="Horizontal Release Side (ft)" label={{ value: 'Horizontal Release Side (ft)', position: 'insideBottom', offset: -5 }} domain={[-3.5, 3.5]} />
+                    <YAxis type="number" dataKey="RelHeight" name="Vertical Release Height (ft)" label={{ value: 'Vertical Release Height (ft)', angle: -90, position: 'insideLeft' }} domain={[1, 7]} />
                     <Tooltip cursor={{ strokeDasharray: '3 3' }} />
                     <Legend />
-                    {Array.from(new Set(pitchData.map(p => p.TaggedPitchType || p.AutoPitchType || p.PitchType))).filter(Boolean).map((type, idx) => (
+                    {Array.from(new Set(pitchData.map(p => p.AutoPitchType || 'Unknown'))).map((type, idx) => (
                       <Scatter
                         key={type}
                         name={type}
-                        data={pitchData.filter(p => (p.TaggedPitchType || p.AutoPitchType || p.PitchType) === type)}
+                        data={pitchData.filter(p => p.AutoPitchType === type)}
                         fill={['#8884d8', '#82ca9d', '#ff7300', '#ff0000', '#0088FE', '#00C49F', '#FFBB28', '#FF8042'][idx % 8]}
                         line={false}
                       />
@@ -283,7 +272,7 @@ const ViewReport = () => {
                 className="download-button"
                 disabled={downloading}
               >
-                {downloading ? 'Downloading...' : '📄 Download PDF Report'}
+                {downloading ? 'Downloading...' : '\ud83d\udcc4 Download PDF Report'}
               </button>
             </div>
           </>
