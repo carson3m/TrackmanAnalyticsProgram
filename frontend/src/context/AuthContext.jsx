@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = async (username, password) => {
+  const login = async (email, password) => {
     try {
       // Try the configured API URL first
       let response;
@@ -47,17 +47,17 @@ export const AuthProvider = ({ children }) => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ username, password }),
+          body: JSON.stringify({ email, password }),
         });
       } catch (networkError) {
         // Fallback to the EB environment URL if the configured URL fails
         console.warn('Primary API URL failed, trying fallback:', networkError);
-        response = await fetch(`${FALLBACK_API_URL}/api/auth/login`, {
+        response = await fetch(`${FALLBACK_API_URL}/auth/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ username, password }),
+          body: JSON.stringify({ email, password }),
         });
       }
 

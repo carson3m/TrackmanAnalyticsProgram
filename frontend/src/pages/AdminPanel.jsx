@@ -6,21 +6,30 @@ import './AdminPanel.css';
 
 const AdminPanel = () => {
   const [users, setUsers] = useState([]);
+  const [teams, setTeams] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showCreateTeamForm, setShowCreateTeamForm] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [formData, setFormData] = useState({
-    username: '',
+    name: '',
+    email: '',
     password: '',
-    role: 'user'
+    role: 'user',
+    team_id: ''
+  });
+  const [teamFormData, setTeamFormData] = useState({
+    name: '',
+    organization: ''
   });
   const { token, user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchUsers();
+    fetchTeams();
     fetchStats();
   }, []);
 
@@ -43,6 +52,25 @@ const AdminPanel = () => {
       setError('Failed to load users. Please try again.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchTeams = async () => {
+    try {
+      const response = await fetch(API_ENDPOINTS.ADMIN_TEAMS, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch teams');
+      }
+
+      const data = await response.json();
+      setTeams(data);
+    } catch (error) {
+      console.error('Error fetching teams:', error);
     }
   };
 
@@ -83,8 +111,9 @@ const AdminPanel = () => {
       }
 
       setShowCreateForm(false);
-      setFormData({ username: '', password: '', role: 'user' });
+      setFormData({ name: '', email: '', password: '', role: 'user', team_id: '' });
       fetchUsers();
+      fetchTeams();
       fetchStats();
     } catch (error) {
       console.error('Error creating user:', error);
@@ -96,9 +125,11 @@ const AdminPanel = () => {
     e.preventDefault();
     try {
       const updateData = {};
-      if (formData.username) updateData.username = formData.username;
+      if (formData.name) updateData.name = formData.name;
+      if (formData.email) updateData.email = formData.email;
       if (formData.password) updateData.password = formData.password;
       if (formData.role) updateData.role = formData.role;
+      if (formData.team_id !== undefined) updateData.team_id = formData.team_id || null;
 
       const response = await fetch(`${API_ENDPOINTS.ADMIN_USERS}/${editingUser.id}`, {
         method: 'PUT',
@@ -115,8 +146,9 @@ const AdminPanel = () => {
       }
 
       setEditingUser(null);
-      setFormData({ username: '', password: '', role: 'user' });
+      setFormData({ name: '', email: '', password: '', role: 'user', team_id: '' });
       fetchUsers();
+      fetchTeams();
       fetchStats();
     } catch (error) {
       console.error('Error updating user:', error);
@@ -143,6 +175,7 @@ const AdminPanel = () => {
       }
 
       fetchUsers();
+      fetchTeams();
       fetchStats();
     } catch (error) {
       console.error('Error deleting user:', error);
@@ -153,15 +186,43 @@ const AdminPanel = () => {
   const handleEditUser = (user) => {
     setEditingUser(user);
     setFormData({
-      username: user.username,
+      name: user.name,
+      email: user.email,
       password: '',
-      role: user.role
+      role: user.role,
+      team_id: user.team_id || ''
     });
   };
 
   const handleCancelEdit = () => {
     setEditingUser(null);
-    setFormData({ username: '', password: '', role: 'user' });
+    setFormData({ name: '', email: '', password: '', role: 'user', team_id: '' });
+  };
+
+  const handleCreateTeam = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(API_ENDPOINTS.ADMIN_TEAMS, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(teamFormData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to create team');
+      }
+
+      setShowCreateTeamForm(false);
+      setTeamFormData({ name: '', organization: '' });
+      fetchTeams();
+    } catch (error) {
+      console.error('Error creating team:', error);
+      setError(error.message);
+    }
   };
 
   const handleBackToDashboard = () => {
@@ -207,6 +268,41 @@ const AdminPanel = () => {
           </div>
         )}
 
+        <div className="teams-section">
+          <div className="section-header">
+            <h2>🏟️ Team Management</h2>
+            <button
+              onClick={() => setShowCreateTeamForm(true)}
+              className="create-button"
+            >
+              + Add New Team
+            </button>
+          </div>
+
+          <div className="teams-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Team Name</th>
+                  <th>Organization</th>
+                  <th>Users</th>
+                </tr>
+              </thead>
+              <tbody>
+                {teams.map((team) => (
+                  <tr key={team.id}>
+                    <td>{team.id}</td>
+                    <td>{team.name}</td>
+                    <td>{team.organization || '-'}</td>
+                    <td>{team.user_count}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         <div className="users-section">
           <div className="section-header">
             <h2>👥 User Management</h2>
@@ -218,17 +314,63 @@ const AdminPanel = () => {
             </button>
           </div>
 
+          {showCreateTeamForm && (
+            <div className="form-overlay">
+              <div className="form-modal">
+                <h3>Create New Team</h3>
+                <form onSubmit={handleCreateTeam}>
+                  <div className="form-group">
+                    <label>Team Name:</label>
+                    <input
+                      type="text"
+                      value={teamFormData.name}
+                      onChange={(e) => setTeamFormData({...teamFormData, name: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Organization:</label>
+                    <input
+                      type="text"
+                      value={teamFormData.organization}
+                      onChange={(e) => setTeamFormData({...teamFormData, organization: e.target.value})}
+                    />
+                  </div>
+                  <div className="form-actions">
+                    <button type="submit" className="submit-button">Create Team</button>
+                    <button
+                      type="button"
+                      onClick={() => setShowCreateTeamForm(false)}
+                      className="cancel-button"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
           {showCreateForm && (
             <div className="form-overlay">
               <div className="form-modal">
                 <h3>Create New User</h3>
                 <form onSubmit={handleCreateUser}>
                   <div className="form-group">
-                    <label>Username:</label>
+                    <label>Name:</label>
                     <input
                       type="text"
-                      value={formData.username}
-                      onChange={(e) => setFormData({...formData, username: e.target.value})}
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Email:</label>
+                    <input
+                      type="text"
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
                       required
                     />
                   </div>
@@ -252,6 +394,20 @@ const AdminPanel = () => {
                       <option value="admin">Admin</option>
                     </select>
                   </div>
+                  <div className="form-group">
+                    <label>Team:</label>
+                    <select
+                      value={formData.team_id}
+                      onChange={(e) => setFormData({...formData, team_id: e.target.value ? parseInt(e.target.value) : ''})}
+                    >
+                      <option value="">No Team</option>
+                      {teams.map((team) => (
+                        <option key={team.id} value={team.id}>
+                          {team.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                   <div className="form-actions">
                     <button type="submit" className="submit-button">Create User</button>
                     <button
@@ -270,14 +426,23 @@ const AdminPanel = () => {
           {editingUser && (
             <div className="form-overlay">
               <div className="form-modal">
-                <h3>Edit User: {editingUser.username}</h3>
+                <h3>Edit User: {editingUser.email}</h3>
                 <form onSubmit={handleUpdateUser}>
                   <div className="form-group">
-                    <label>Username:</label>
+                    <label>Name:</label>
                     <input
                       type="text"
-                      value={formData.username}
-                      onChange={(e) => setFormData({...formData, username: e.target.value})}
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Email:</label>
+                    <input
+                      type="text"
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
                       required
                     />
                   </div>
@@ -300,6 +465,20 @@ const AdminPanel = () => {
                       <option value="admin">Admin</option>
                     </select>
                   </div>
+                  <div className="form-group">
+                    <label>Team:</label>
+                    <select
+                      value={formData.team_id}
+                      onChange={(e) => setFormData({...formData, team_id: e.target.value ? parseInt(e.target.value) : ''})}
+                    >
+                      <option value="">No Team</option>
+                      {teams.map((team) => (
+                        <option key={team.id} value={team.id}>
+                          {team.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                   <div className="form-actions">
                     <button type="submit" className="submit-button">Update User</button>
                     <button
@@ -320,8 +499,10 @@ const AdminPanel = () => {
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Username</th>
+                  <th>Name</th>
+                  <th>Email</th>
                   <th>Role</th>
+                  <th>Team</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -329,12 +510,14 @@ const AdminPanel = () => {
                 {users.map((rowUser) => (
                   <tr key={rowUser.id}>
                     <td>{rowUser.id}</td>
-                    <td>{rowUser.username}</td>
+                    <td>{rowUser.name}</td>
+                    <td>{rowUser.email}</td>
                     <td>
                       <span className={`role-badge ${rowUser.role}`}>
                         {rowUser.role}
                       </span>
                     </td>
+                    <td>{rowUser.team_name || '-'}</td>
                     <td>
                       <div className="action-buttons">
                         <button

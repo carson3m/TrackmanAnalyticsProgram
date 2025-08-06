@@ -12,17 +12,13 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# CORS settings - allow only production domains
+# CORS settings - allow specific origins with credentials
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://moundvision.com",
-        "https://www.moundvision.com",
-        "https://api.moundvision.com",
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=["https://moundvision.com", "https://www.moundvision.com", "http://localhost:3000", "http://localhost:5173"],
+    allow_credentials=True,  # Allow credentials (JWT tokens)
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*", "Authorization", "Content-Type"],
 )
 
 # Root endpoint for AWS health checks

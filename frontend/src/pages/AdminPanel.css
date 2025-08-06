@@ -1,10 +1,13 @@
 .admin-container {
   min-height: 100vh;
+  width: 100vw;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #f8fafc;
   padding: 20px;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 .admin-card {
@@ -13,7 +16,9 @@
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   padding: 40px;
   width: 100%;
-  max-width: 1200px;
+  max-width: none;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 .admin-header {
@@ -37,6 +42,7 @@
 
 .stats-section {
   margin-bottom: 40px;
+  width: 100%;
 }
 
 .stats-section h2 {
@@ -51,6 +57,7 @@
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
   margin-bottom: 30px;
+  width: 100%;
 }
 
 .stat-card {
@@ -68,7 +75,7 @@
 }
 
 .stat-card.primary {
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #B22222;
 }
 
 .stat-card.danger {
@@ -100,7 +107,7 @@
 }
 
 .stat-card.primary .stat-value {
-  color: #667eea;
+  color: #B22222;
 }
 
 .stat-card.danger .stat-value {
@@ -117,6 +124,7 @@
 
 .users-section {
   margin-bottom: 30px;
+  width: 100%;
 }
 
 .section-header {
@@ -124,6 +132,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  width: 100%;
 }
 
 .section-header h2 {
@@ -135,7 +144,7 @@
 
 .create-button {
   padding: 10px 20px;
-  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  background: linear-gradient(135deg, #B22222 0%, #8B1A1A 100%);
   color: white;
   border: none;
   border-radius: 6px;
@@ -147,17 +156,21 @@
 
 .create-button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+  box-shadow: 0 4px 12px rgba(178, 34, 34, 0.3);
 }
 
+.teams-table,
 .users-table {
   background: white;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   border: 1px solid #e2e8f0;
+  width: 100%;
+  margin-bottom: 30px;
 }
 
+.teams-table table,
 .users-table table {
   width: 100%;
   border-collapse: collapse;
@@ -303,7 +316,7 @@
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #B22222;
 }
 
 .form-actions {
@@ -325,12 +338,12 @@
 }
 
 .submit-button {
-  background: #48bb78;
+  background: #B22222;
   color: white;
 }
 
 .submit-button:hover {
-  background: #38a169;
+  background: #8B1A1A;
 }
 
 .cancel-button {
@@ -363,6 +376,7 @@
   display: flex;
   justify-content: center;
   margin-top: 30px;
+  width: 100%;
 }
 
 .secondary-button {

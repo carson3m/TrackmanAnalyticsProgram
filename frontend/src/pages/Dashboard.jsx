@@ -4,17 +4,10 @@ import { useAuth } from '../context/AuthContext';
 import './Dashboard.css';
 
 const Dashboard = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
 
-  const handleUploadCSV = () => {
-    navigate('/upload');
-  };
 
   const handleBestOfStats = () => {
     navigate('/best-of');
@@ -28,23 +21,19 @@ const Dashboard = () => {
     navigate('/admin');
   };
 
+  const handleRosterManagement = () => {
+    navigate('/roster');
+  };
+
+  const handleDevelopment = () => {
+    navigate('/development');
+  };
+
   const isAdmin = user?.role === 'admin';
 
   return (
     <div className="dashboard-container">
-      <nav className="dashboard-nav">
-        <div className="nav-brand">
-          <h2>MoundVision Analytics</h2>
-        </div>
-        <div className="nav-user">
-          <span>Welcome, {user?.username}</span>
-          <button onClick={handleLogout} className="logout-button">
-            Logout
-          </button>
-        </div>
-      </nav>
-
-      <main className="dashboard-main">
+      <div className="dashboard-main">
         <div className="dashboard-header">
           <h1>Analytics Dashboard</h1>
           <p>Upload your CSV data and generate comprehensive reports</p>
@@ -52,11 +41,20 @@ const Dashboard = () => {
 
         <div className="dashboard-cards">
           <div className="dashboard-card">
+            <div className="card-icon">📅</div>
+            <h3>Game Calendar</h3>
+            <p>View your season schedule with wins, losses, and game results</p>
+            <button onClick={() => navigate('/calendar')} className="card-button">
+              View Calendar
+            </button>
+          </div>
+
+          <div className="dashboard-card">
             <div className="card-icon">📊</div>
-            <h3>Upload CSV Data</h3>
-            <p>Upload your CSV file to begin analysis</p>
-            <button onClick={handleUploadCSV} className="card-button">
-              Start Analysis
+            <h3>CSV Data Management</h3>
+            <p>Upload, manage, and analyze your team's Trackman CSV files</p>
+            <button onClick={() => navigate('/csv-management')} className="card-button">
+              Manage CSV Files
             </button>
           </div>
 
@@ -79,7 +77,7 @@ const Dashboard = () => {
           </div>
 
           {isAdmin && (
-            <div className="dashboard-card admin-card">
+            <div className="dashboard-card">
               <div className="card-icon">👑</div>
               <h3>Admin Panel</h3>
               <p>Manage users and system settings</p>
@@ -88,6 +86,33 @@ const Dashboard = () => {
               </button>
             </div>
           )}
+
+          <div className="dashboard-card">
+            <div className="card-icon">👥</div>
+            <h3>Team Roster</h3>
+            <p>View and manage your team's roster of players</p>
+            <button onClick={handleRosterManagement} className="card-button">
+              Manage Roster
+            </button>
+          </div>
+
+          <div className="dashboard-card">
+            <div className="card-icon">📈</div>
+            <h3>Player Development</h3>
+            <p>Identify improvement areas and get actionable training recommendations</p>
+            <button onClick={handleDevelopment} className="card-button">
+              View Development
+            </button>
+          </div>
+
+          <div className="dashboard-card">
+            <div className="card-icon">🎯</div>
+            <h3>Metric Targets</h3>
+            <p>Set custom target values for performance metrics to match your team's goals</p>
+            <button onClick={() => navigate('/metric-targets')} className="card-button">
+              Manage Targets
+            </button>
+          </div>
 
           <div className="dashboard-card">
             <div className="card-icon">📱</div>
@@ -120,15 +145,17 @@ const Dashboard = () => {
         <div className="dashboard-info">
           <h3>Getting Started</h3>
           <ol>
-            <li>Click "Start Analysis" to upload your CSV file (Trackman format supported)</li>
-            <li>Select the team and pitcher you want to analyze</li>
-            <li>View comprehensive metrics and download PDF reports</li>
-            <li>Use "Best of Stats" to see top performers across metrics</li>
-            <li>Analyze umpire accuracy with the Umpire Accuracy tool</li>
+            <li>Upload your Trackman CSV files using "CSV Data Management"</li>
+            <li>View your team's roster and player information in "Team Roster"</li>
+            <li>Explore "Best of Stats" to see top performers across all metrics</li>
+            <li>Generate game reports and player profiles for detailed analysis</li>
+            <li>Create social media graphics to showcase player achievements</li>
+            <li>Use "Player Development" to identify improvement areas and training recommendations</li>
+            <li>Set custom metric targets in "Metric Targets" to match your team's goals</li>
             {isAdmin && <li>Access the Admin Panel to manage users and system settings</li>}
           </ol>
         </div>
-      </main>
+      </div>
     </div>
   );
 };

@@ -22,21 +22,41 @@ const SelectPitcher = () => {
       }
 
       try {
-        const response = await fetch(
-          `${API_ENDPOINTS.TEAM_PITCHERS}?team=${encodeURIComponent(selectedTeam)}`,
-          {
+        // Check if we have a selected CSV file
+        const selectedCSVFile = sessionStorage.getItem('selectedCSVFile');
+        if (selectedCSVFile) {
+          // Use the file-specific pitchers endpoint with team filter
+          const csvFile = JSON.parse(selectedCSVFile);
+          const response = await fetch(`${API_ENDPOINTS.FILE_PITCHERS}/${csvFile.id}/pitchers?team=${encodeURIComponent(selectedTeam)}`, {
             headers: {
               'Authorization': `Bearer ${token}`,
             },
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch pitchers');
           }
-        );
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch pitchers');
+          const data = await response.json();
+          setPitchers(data.pitchers || []);
+        } else {
+          // Use the team_pitchers endpoint for backward compatibility
+          const response = await fetch(
+            `${API_ENDPOINTS.TEAM_PITCHERS}?team=${encodeURIComponent(selectedTeam)}`,
+            {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch pitchers');
+          }
+
+          const data = await response.json();
+          setPitchers(data.pitchers || []);
         }
-
-        const data = await response.json();
-        setPitchers(data.pitchers || []);
       } catch (error) {
         console.error('Error fetching pitchers:', error);
         setError('Failed to load pitchers. Please try again.');
@@ -56,6 +76,8 @@ const SelectPitcher = () => {
     if (selectedPitcher) {
       // Store selected pitcher for next page
       sessionStorage.setItem('selectedPitcher', selectedPitcher);
+      
+      // Navigate to the ViewReport page (the comprehensive report with charts and PDF export)
       navigate('/report');
     }
   };

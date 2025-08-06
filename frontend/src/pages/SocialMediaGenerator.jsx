@@ -60,6 +60,28 @@ const EXTENDED_STATS = [
   // ...add more as needed, but keep it under 60
 ];
 
+// Stat definitions
+const PITCHER_STATS = [
+  { label: 'Pitch Speed', column: 'RelSpeed', auto: true },
+  { label: 'Spin Rate', column: 'SpinRate', auto: true },
+  { label: 'Innings Pitched', column: 'Inning', auto: false },
+  { label: 'Strikeouts', column: 'KorBB', auto: false },
+  { label: 'Pitch Type', column: 'AutoPitchType', auto: false },
+  { label: 'Distance', column: 'Distance', auto: true },
+];
+const BATTER_STATS = [
+  { label: 'Exit Velocity', column: 'ExitSpeed', auto: true },
+  { label: 'Home Runs', column: 'PlayResult', auto: false },
+  { label: 'Batting Average', column: 'BattingAverage', auto: false },
+  { label: 'Distance', column: 'Distance', auto: true },
+];
+const SHARED_STATS = [
+  { label: 'Spin Rate', column: 'SpinRate', auto: true },
+  { label: 'Pitch Speed', column: 'RelSpeed', auto: true },
+  { label: 'Exit Velocity', column: 'ExitSpeed', auto: true },
+  { label: 'Distance', column: 'Distance', auto: true },
+];
+
 const SocialMediaGenerator = () => {
   const [mode, setMode] = useState('topN');
   const [csvData, setCsvData] = useState(null);
@@ -85,6 +107,12 @@ const SocialMediaGenerator = () => {
   const [generating, setGenerating] = useState(false);
   const [playerImage, setPlayerImage] = useState(null);
   const [logoFile, setLogoFile] = useState(null);
+  const [formDataDebug, setFormDataDebug] = useState('');
+  const [selectedStats, setSelectedStats] = useState([]); // [{label, column, manualValue}]
+  // Add to state
+  const [customStatLabel, setCustomStatLabel] = useState('');
+  const [customStatValue, setCustomStatValue] = useState('');
+  const [validationErrors, setValidationErrors] = useState({});
 
   // CSV upload and parsing
   const handleCsvUpload = (e) => {
@@ -150,6 +178,20 @@ const SocialMediaGenerator = () => {
   const addManualStat = () => setManualStats([...manualStats, { stat: '', value: '' }]);
   const removeManualStat = (idx) => setManualStats(manualStats.filter((_, i) => i !== idx));
 
+  // Helper to get highest value from CSV for a stat/column
+  const getMaxStatValue = (column) => {
+    if (!csvData || !player) return '';
+    const playerRows = csvData.filter(row => row.Pitcher === player || row.Batter === player);
+    const values = playerRows.map(row => parseFloat(row[column])).filter(v => !isNaN(v));
+    if (!values.length) return '';
+    return Math.max(...values).toFixed(2);
+  };
+
+  // Helper to check if a stat requires manual entry and is missing
+  const isManualRequiredAndMissing = (stat) => {
+    return !stat.auto && (!stat.manualValue || stat.manualValue.trim() === '');
+  };
+
   // Instead of demo: hardcoded stat labels/values, use selected and manual stats
   let statLabels = [];
   let statValues = [];
@@ -157,10 +199,11 @@ const SocialMediaGenerator = () => {
     statLabels = [selectedStat === 'custom' ? customStat : selectedStat];
     statValues = [manualStats[0]?.value || ''];
   } else if (mode === 'profile') {
-    statLabels = manualStats.map(s => s.stat).filter(Boolean);
-    statValues = manualStats.map(s => s.value).filter(Boolean);
+    statLabels = selectedStats.map(s => s.label);
+    statValues = selectedStats.map(s => s.manualValue || (s.auto ? getMaxStatValue(s.column) : ''));
   }
 
+  // When generating, validate required manual fields
   const handleGenerate = async () => {
     // Validation: require at least one stat label and value
     if (!statLabels.length || !statValues.length || statLabels.some(l => !l) || statValues.some(v => !v)) {
@@ -174,33 +217,33 @@ const SocialMediaGenerator = () => {
     let title = mode === 'topN' ? 'DATA ROUNDUP' : `${profileType === 'pitcher' ? 'Pitcher' : 'Batter'} Profile`;
     let subtitle = '';
     if (mode === 'topN') {
-      subtitle = `${selectedStat === 'custom' ? customStat : selectedStat}`;
-      if (timeFrame !== 'all') subtitle += ` - ${timeFrame}`;
-    } else {
+      subtitle = `${selectedStat === 'custom' ? customStat : selectedStat} Leader`;
+    } else if (mode === 'profile') {
       subtitle = player;
     }
     formData.append('mode', mode);
     formData.append('title', title);
     formData.append('subtitle', subtitle);
-    statLabels.forEach(label => formData.append('stat_labels', label));
-    statValues.forEach(value => formData.append('stat_values', value));
-    formData.append('accent_color', accentColor || '#1e90ff');
+    formData.append('accent_color', accentColor);
     formData.append('aspect', aspect);
-    formData.append('hashtag', hashtag);
+    if (hashtag) formData.append('hashtag', hashtag);
     if (logoFile) formData.append('logo', logoFile);
     if (playerImage) formData.append('player_image', playerImage);
-    // Debug: log FormData
-    for (let pair of formData.entries()) {
-      console.log(pair[0]+ ':', pair[1]);
-    }
+    // Add selected stats
+    statLabels.forEach(label => formData.append('stat_labels', label));
+    statValues.forEach(value => formData.append('stat_values', value));
     try {
       const resp = await fetch(API_ENDPOINTS.SOCIAL_GENERATE_GRAPHIC, {
         method: 'POST',
         body: formData,
       });
-      if (!resp.ok) throw new Error('Failed to generate image');
-      const blob = await resp.blob();
-      setGeneratedImage(URL.createObjectURL(blob));
+      if (resp.ok) {
+        const blob = await resp.blob();
+        setGeneratedImage(URL.createObjectURL(blob));
+      } else {
+        const errorText = await resp.text();
+        alert('Error generating graphic: ' + errorText);
+      }
     } catch (err) {
       alert('Error generating graphic: ' + err.message);
     } finally {
@@ -283,7 +326,7 @@ const SocialMediaGenerator = () => {
         <>
           <div className="smg-section">
             <label>Profile Type:</label>
-            <select value={profileType} onChange={e => setProfileType(e.target.value)}>
+            <select value={profileType} onChange={e => { setProfileType(e.target.value); setSelectedStats([]); }}>
               <option value="pitcher">Pitcher</option>
               <option value="batter">Batter</option>
             </select>
@@ -297,43 +340,69 @@ const SocialMediaGenerator = () => {
           </div>
           <div className="smg-section">
             <label>Stats to Display:</label>
-            {(showAllStats ? EXTENDED_STATS : RECOMMENDED_STATS).map(stat => (
-              columns.includes(stat.column) && (
-                <div key={stat.column} style={{ display: 'inline-block', marginRight: '1rem' }}>
+            {((profileType === 'pitcher' ? PITCHER_STATS : BATTER_STATS).concat(SHARED_STATS.filter(s => !(profileType === 'pitcher' ? PITCHER_STATS : BATTER_STATS).some(ps => ps.column === s.column)))).map(stat => {
+              const selected = selectedStats.find(s => s.column === stat.column);
+              const error = validationErrors[stat.column];
+              return (
+                <div key={stat.column} style={{ display: 'inline-block', marginRight: '1rem', marginBottom: '0.5rem' }}>
                   <input
                     type="checkbox"
                     id={`stat-${stat.column}`}
-                    // TODO: handle checked state and selection logic
+                    checked={!!selected}
+                    onChange={e => {
+                      if (e.target.checked) {
+                        setSelectedStats([...selectedStats, { ...stat, manualValue: '' }]);
+                      } else {
+                        setSelectedStats(selectedStats.filter(s => s.column !== stat.column));
+                      }
+                    }}
                   />
                   <label htmlFor={`stat-${stat.column}`}>{stat.label}</label>
+                  {selected && (
+                    <span title={stat.auto ? 'Leave blank to use highest value from CSV' : 'Manual entry required'} style={{ marginLeft: 4, color: stat.auto ? '#888' : '#d00', fontWeight: stat.auto ? 'normal' : 'bold' }}>
+                      {stat.auto ? '(auto or manual)' : '*'}
+                    </span>
+                  )}
+                  {selected && (
+                    <input
+                      type="text"
+                      placeholder={stat.auto ? `Auto: ${getMaxStatValue(stat.column)}` : 'Manual entry required'}
+                      value={selected.manualValue || ''}
+                      onChange={e => {
+                        setSelectedStats(selectedStats.map(s =>
+                          s.column === stat.column ? { ...s, manualValue: e.target.value } : s
+                        ));
+                      }}
+                      style={{ marginLeft: '0.5rem', width: '80px', borderColor: error ? '#d00' : undefined, background: error ? '#ffeaea' : undefined }}
+                    />
+                  )}
+                  {error && <span style={{ color: '#d00', fontSize: 12, marginLeft: 4 }}>{error}</span>}
                 </div>
-              )
-            ))}
-            <button type="button" onClick={() => setShowAllStats(s => !s)} style={{ marginLeft: '1rem' }}>
-              {showAllStats ? 'Show Recommended' : 'Show All Stats'}
-            </button>
-            {/* Custom stat input */}
+              );
+            })}
+            {/* Custom stat adder */}
             <div style={{ marginTop: '1rem' }}>
-              <label>Custom Stat:</label>
               <input
                 type="text"
-                placeholder="Custom stat name"
-                value={customStat}
-                onChange={e => setCustomStat(e.target.value)}
-                style={{ marginLeft: '0.5rem', width: '140px' }}
+                placeholder="Custom stat label"
+                value={customStatLabel}
+                onChange={e => setCustomStatLabel(e.target.value)}
+                style={{ width: '120px', marginRight: '0.5rem' }}
               />
-              {/* Mapping to CSV column */}
-              <span style={{ marginLeft: '1rem' }}>Map to:</span>
-              <select
-                value={customStat && columns.includes(customStat) ? customStat : ''}
-                onChange={e => setCustomStat(e.target.value)}
-                style={{ marginLeft: '0.5rem' }}
-              >
-                <option value="">Manual Entry</option>
-                {columns.map(col => (
-                  <option key={col} value={col}>{col}</option>
-                ))}
-              </select>
+              <input
+                type="text"
+                placeholder="Value"
+                value={customStatValue}
+                onChange={e => setCustomStatValue(e.target.value)}
+                style={{ width: '80px', marginRight: '0.5rem' }}
+              />
+              <button type="button" onClick={() => {
+                if (customStatLabel && customStatValue) {
+                  setSelectedStats([...selectedStats, { label: customStatLabel, column: `custom_${Date.now()}`, auto: false, manualValue: customStatValue }]);
+                  setCustomStatLabel('');
+                  setCustomStatValue('');
+                }
+              }}>Add Custom Stat</button>
             </div>
           </div>
         </>
@@ -367,6 +436,7 @@ const SocialMediaGenerator = () => {
         <input type="text" value={hashtag} onChange={e => setHashtag(e.target.value)} placeholder="#GoTeam @YourHandle" style={{ width: '220px' }} />
       </div>
 
+      {/* Visible debug output for FormData */}
       {/* Placeholder for generated image */}
       <div className="smg-section">
         <button className="smg-generate-btn" onClick={handleGenerate} disabled={generating}>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { API_ENDPOINTS, FALLBACK_API_URL } from '../config';
@@ -10,8 +10,16 @@ const UploadCSV = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [teams, setTeams] = useState([]);
-  const { token } = useAuth();
+  const { token, user, isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading) {
+      if (!isAuthenticated || !user || (user.role !== 'admin' && user.role !== 'coach')) {
+        navigate('/dashboard');
+      }
+    }
+  }, [isAuthenticated, user, loading, navigate]);
 
   const handleFileSelect = (e) => {
     const selectedFile = e.target.files[0];
@@ -52,7 +60,7 @@ const UploadCSV = () => {
     formData.append('file', file);
 
     try {
-      const response = await fetch(API_ENDPOINTS.UPLOAD_CSV, {
+      const response = await fetch(API_ENDPOINTS.UPLOAD_CSV_PERSISTENT, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -65,17 +73,10 @@ const UploadCSV = () => {
       }
 
       const data = await response.json();
-      setTeams(data.teams || []);
       setSuccess(true);
-      
-      // Store teams in sessionStorage for next page
-      sessionStorage.setItem('teams', JSON.stringify(data.teams || []));
-      
-      // Navigate to team selection after a brief delay
       setTimeout(() => {
-        navigate('/select-team');
+        navigate('/csv-management');
       }, 1500);
-
     } catch (error) {
       console.error('Upload error:', error);
       setError('Failed to upload file. Please try again.');

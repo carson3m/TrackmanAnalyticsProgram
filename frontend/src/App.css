@@ -4,15 +4,18 @@
   box-sizing: border-box;
 }
 
-body {
-  background: #0A1A2F;
+/* Global styles for authenticated app pages only */
+.authenticated-app {
+  background: #f8fafc;
   font-family: 'Inter', 'Roboto', Arial, sans-serif;
   margin: 0;
+  padding: 0;
   min-height: 100vh;
-  color: #F7F7F5;
+  width: 100vw;
+  color: #0A1A2F;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .app-header {
@@ -23,6 +26,8 @@ body {
   padding: 24px 40px 16px 40px;
   border-bottom: 2px solid #B22222;
   min-height: 80px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .logo-container {
@@ -51,19 +56,46 @@ body {
   letter-spacing: 1px;
 }
 
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.welcome-text {
+  color: #F7F7F5;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.logout-button {
+  background: #e53e3e;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.logout-button:hover {
+  background: #c53030;
+}
+
 .main-content {
-  max-width: 1100px;
-  margin: 48px auto 0 auto;
-  background: #F7F7F5;
-  border-radius: 18px;
-  box-shadow: 0 4px 32px rgba(10,26,47,0.10);
-  padding: 36px 36px 24px 36px;
+  width: 100%;
+  background: #f8fafc;
   color: #0A1A2F;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  min-height: 70vh;
+  justify-content: flex-start;
+  min-height: calc(100vh - 80px);
+  padding: 36px;
+  box-sizing: border-box;
+  flex: 1;
 }
 
 .metrics-grid {
@@ -234,4 +266,47 @@ body {
   .plot-section {
     padding: 10px 2px 8px 2px;
   }
+  .app-header {
+    padding: 16px 20px;
+    flex-direction: column;
+    gap: 1rem;
+    min-height: auto;
+  }
+  
+  .brand-title {
+    font-size: 1.8rem;
+  }
+  
+  .user-section {
+    order: -1;
+  }
+}
+
+/* Global styles for all pages */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', 'Roboto', Arial, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Ensure all containers use full width */
+.container, .page-container, .main-container {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Override any max-width constraints */
+[class*="container"], [class*="card"], [class*="panel"] {
+  max-width: none !important;
+  width: 100% !important;
+}
+
+/* Ensure proper spacing */
+.page-content, .content-area {
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
 }

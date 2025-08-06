@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { API_ENDPOINTS, FALLBACK_API_URL } from '../config';
 import './ViewReport.css';
-import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
 
 const ViewReport = () => {
   const [metrics, setMetrics] = useState(null);
@@ -18,6 +18,7 @@ const ViewReport = () => {
 
   const selectedTeam = sessionStorage.getItem('selectedTeam');
   const selectedPitcher = sessionStorage.getItem('selectedPitcher');
+  const selectedCSVFile = sessionStorage.getItem('selectedCSVFile');
 
   useEffect(() => {
     const fetchMetrics = async () => {
@@ -28,40 +29,111 @@ const ViewReport = () => {
       }
 
       try {
-              // ADD THIS LOG:
-      console.log('Sending metrics request:', {
-        team: selectedTeam,
-        pitcher: selectedPitcher,
-      });
-        const response = await fetch(
-          API_ENDPOINTS.METRICS_SUMMARY,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              team: selectedTeam,
-              pitcher: selectedPitcher,
-            }),
+        // Check if we have a selected CSV file (new flow) or not (old flow)
+        if (selectedCSVFile) {
+          const csvFile = JSON.parse(selectedCSVFile);
+          console.log('Using file-specific report for:', {
+            fileId: csvFile.id,
+            team: selectedTeam,
+            pitcher: selectedPitcher,
+          });
+          
+          // Use the file-specific game report endpoint
+          const response = await fetch(
+            `${API_ENDPOINTS.GAME_REPORT}/${csvFile.id}/pitcher/${encodeURIComponent(selectedPitcher)}`,
+            {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || 'Failed to fetch metrics');
           }
-        );
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.detail || 'Failed to fetch metrics');
-        }
+          const data = await response.json();
+          console.log('Received file-specific metrics data:', data);
+          
+          // Transform the data to match the expected format
+          if (data.pitcher_stats) {
+            console.log('DEBUG: Received pitcher_stats:', data.pitcher_stats);
+            
+            const pitcher_stats = data.pitcher_stats;
+            
+            // Use the detailed per-pitch metrics from the backend if available
+            let per_pitch_metrics = [];
+            if (pitcher_stats.per_pitch_metrics && pitcher_stats.per_pitch_metrics.length > 0) {
+              console.log('DEBUG: Using detailed per-pitch metrics from backend');
+              per_pitch_metrics = pitcher_stats.per_pitch_metrics;
+            } else if (pitcher_stats.pitch_types) {
+              console.log('DEBUG: Using basic pitch type counts');
+              // Fallback to basic pitch type counts
+              per_pitch_metrics = Object.entries(pitcher_stats.pitch_types).map(([pitch_type, count]) => ({
+                'Pitch Type': pitch_type,
+                'Count': count,
+                'Avg Velo': 'N/A',
+                'Spin Rate': 'N/A',
+                'Vert. Break': 'N/A',
+                'Horz. Break': 'N/A',
+                'Strike %': 'N/A',
+                'Whiff %': 'N/A',
+                'Chase %': 'N/A',
+                'Contact %': 'N/A',
+                'Hard Hit %': 'N/A',
+                'Barrel %': 'N/A',
+                'PutAway %': 'N/A',
+                'In-Zone %': 'N/A',
+                'Avg Extension': 'N/A'
+              }));
+            }
+            
+            setMetrics({
+              whiff_rate: 0, // Will be calculated from pitch data
+              strike_rate: pitcher_stats.strike_percentage || 0,
+              zone_rate: 0, // Will be calculated from pitch data
+              per_pitch_metrics: per_pitch_metrics
+            });
+          } else {
+            throw new Error('Invalid data format received');
+          }
+        } else {
+          // Fallback to old metrics endpoint
+          console.log('Using old metrics endpoint for:', {
+            team: selectedTeam,
+            pitcher: selectedPitcher,
+          });
+          
+          const response = await fetch(
+            API_ENDPOINTS.METRICS_SUMMARY,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                team: selectedTeam,
+                pitcher: selectedPitcher,
+              }),
+            }
+          );
 
-        const data = await response.json();
-        console.log('Received metrics data:', data);
-        
-        // Check if the response contains the expected metrics structure
-        if (data.detail) {
-          throw new Error(data.detail);
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || 'Failed to fetch metrics');
+          }
+
+          const data = await response.json();
+          console.log('Received old metrics data:', data);
+          
+          if (data.detail) {
+            throw new Error(data.detail);
+          }
+          
+          setMetrics(data);
         }
-        
-        setMetrics(data);
       } catch (error) {
         console.error('Error fetching metrics:', error);
         setError('Failed to load metrics. Please try again.');
@@ -71,7 +143,7 @@ const ViewReport = () => {
     };
 
     fetchMetrics();
-  }, [token, selectedTeam, selectedPitcher]);
+  }, [token, selectedTeam, selectedPitcher, selectedCSVFile]);
 
   // Fetch pitch-level data for plots
   useEffect(() => {
@@ -84,57 +156,130 @@ const ViewReport = () => {
       setPitchDataLoading(true);
       setPitchDataError('');
       try {
-        const response = await fetch(
-          `${API_ENDPOINTS.METRICS_PITCHES}?team=${encodeURIComponent(selectedTeam)}&pitcher=${encodeURIComponent(selectedPitcher)}`,
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-            },
+        // Check if we have a selected CSV file (new flow) or not (old flow)
+        if (selectedCSVFile) {
+          const csvFile = JSON.parse(selectedCSVFile);
+          console.log('Using file-specific pitch data for:', {
+            fileId: csvFile.id,
+            team: selectedTeam,
+            pitcher: selectedPitcher,
+          });
+          
+          // Use the file-specific game report endpoint to get pitch data
+          const response = await fetch(
+            `${API_ENDPOINTS.GAME_REPORT}/${csvFile.id}/pitcher/${encodeURIComponent(selectedPitcher)}`,
+            {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+              },
+            }
+          );
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || 'Failed to fetch pitch data');
           }
-        );
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.detail || 'Failed to fetch pitch data');
+          
+          const data = await response.json();
+          console.log('Received file-specific pitch data:', data.pitches);
+          setPitchData(data.pitches || []);
+        } else {
+          // Fallback to old pitch data endpoint
+          console.log('Using old pitch data endpoint for:', {
+            team: selectedTeam,
+            pitcher: selectedPitcher,
+          });
+          
+          const response = await fetch(
+            `${API_ENDPOINTS.METRICS_PITCHES}?team=${encodeURIComponent(selectedTeam)}&pitcher=${encodeURIComponent(selectedPitcher)}`,
+            {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+              },
+            }
+          );
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || 'Failed to fetch pitch data');
+          }
+          const data = await response.json();
+          console.log('Received old pitch data:', data.pitches);
+          setPitchData(data.pitches || []);
         }
-        const data = await response.json();
-        console.log('Received pitch data:', data.pitches);
-        console.log('Sample pitch object:', data.pitches[0]);
-        console.log('Available pitch type columns:', data.pitches.length > 0 ? Object.keys(data.pitches[0]).filter(key => key.toLowerCase().includes('pitch')) : []);
-        setPitchData(data.pitches || []);
       } catch (error) {
+        console.error('Error fetching pitch data:', error);
         setPitchDataError('Failed to load pitch data.');
       } finally {
         setPitchDataLoading(false);
       }
     };
     fetchPitchData();
-  }, [token, selectedTeam, selectedPitcher]);
+  }, [token, selectedTeam, selectedPitcher, selectedCSVFile]);
 
   const handleDownloadPDF = async () => {
     setDownloading(true);
     try {
-      const response = await fetch(
-        `${API_ENDPOINTS.METRICS_DOWNLOAD_PDF}?team=${encodeURIComponent(selectedTeam)}&pitcher=${encodeURIComponent(selectedPitcher)}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
+      // Check if we have a selected CSV file (new flow) or not (old flow)
+      if (selectedCSVFile) {
+        const csvFile = JSON.parse(selectedCSVFile);
+        console.log('Using file-specific PDF download for:', {
+          fileId: csvFile.id,
+          pitcher: selectedPitcher,
+        });
+        
+        // Use the file-specific PDF endpoint
+        const response = await fetch(
+          `${API_ENDPOINTS.GAME_REPORT}/${csvFile.id}/pitcher/${encodeURIComponent(selectedPitcher)}/pdf`,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to download PDF');
         }
-      );
 
-      if (!response.ok) {
-        throw new Error('Failed to download PDF');
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${selectedPitcher}_${csvFile.game_date}_report.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } else {
+        // Fallback to old PDF endpoint
+        console.log('Using old PDF endpoint for:', {
+          team: selectedTeam,
+          pitcher: selectedPitcher,
+        });
+        
+        const response = await fetch(
+          `${API_ENDPOINTS.METRICS_DOWNLOAD_PDF}?team=${encodeURIComponent(selectedTeam)}&pitcher=${encodeURIComponent(selectedPitcher)}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to download PDF');
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${selectedPitcher}_${selectedTeam}_report.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
       }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${selectedPitcher}_${selectedTeam}_report.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
     } catch (error) {
       console.error('Error downloading PDF:', error);
       setError('Failed to download PDF. Please try again.');
@@ -217,6 +362,9 @@ const ViewReport = () => {
                     <YAxis type="number" dataKey="InducedVertBreak" name="Vertical Break (in)" label={{ value: 'Vertical Break (in)', angle: -90, position: 'insideLeft' }} domain={[-25, 25]} />
                     <Tooltip cursor={{ strokeDasharray: '3 3' }} />
                     <Legend />
+                    {/* Add 0" axis lines */}
+                    <ReferenceLine x={0} stroke="black" strokeWidth={1} strokeOpacity={0.7} />
+                    <ReferenceLine y={0} stroke="black" strokeWidth={1} strokeOpacity={0.7} />
                     {Array.from(new Set(pitchData.map(p => p.AutoPitchType || 'Unknown'))).map((type, idx) => (
                       <Scatter
                         key={type}
@@ -246,6 +394,9 @@ const ViewReport = () => {
                     <YAxis type="number" dataKey="RelHeight" name="Vertical Release Height (ft)" label={{ value: 'Vertical Release Height (ft)', angle: -90, position: 'insideLeft' }} domain={[1, 7]} />
                     <Tooltip cursor={{ strokeDasharray: '3 3' }} />
                     <Legend />
+                    {/* Add 0" axis lines */}
+                    <ReferenceLine x={0} stroke="black" strokeWidth={1} strokeOpacity={0.7} />
+                    <ReferenceLine y={0} stroke="black" strokeWidth={1} strokeOpacity={0.7} />
                     {Array.from(new Set(pitchData.map(p => p.AutoPitchType || 'Unknown'))).map((type, idx) => (
                       <Scatter
                         key={type}

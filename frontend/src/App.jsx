@@ -10,6 +10,15 @@ import BestOfStats from './pages/BestOfStats';
 import UmpireAccuracy from './pages/UmpireAccuracy';
 import AdminPanel from './pages/AdminPanel';
 import SocialMediaGenerator from './pages/SocialMediaGenerator';
+import RosterManagement from './pages/RosterManagement';
+import CSVManagement from './pages/CSVManagement';
+import GameCalendar from './pages/GameCalendar';
+import GameReport from './pages/GameReport';
+import PlayerProfile from './pages/PlayerProfile';
+import Development from './pages/Development';
+import MetricTargets from './pages/MetricTargets';
+import LandingPage from './pages/LandingPage';
+import AboutUs from './pages/AboutUs';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import './App.css';
 import logo from './assets/moundvision_logo.png';
@@ -32,97 +41,219 @@ const AdminRoute = ({ children }) => {
   return children;
 };
 
+// Authenticated App Layout
+const AuthenticatedApp = ({ children }) => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  return (
+    <div className="authenticated-app">
+      <div className="app-header">
+        <div className="logo-container">
+          <img src={logo} alt="MoundVision Analytics Logo" className="logo-img" />
+          <div>
+            <div className="brand-title">MOUNDVISION ANALYTICS</div>
+            <div className="tagline">Sharper vision. Better results.</div>
+          </div>
+        </div>
+        <div className="user-section">
+          <span className="welcome-text">Welcome, {user?.username}</span>
+          <button onClick={handleLogout} className="logout-button">
+            Logout
+          </button>
+        </div>
+      </div>
+      <div className="main-content">
+        {children}
+      </div>
+    </div>
+  );
+};
+
 function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="app-header">
-          <div className="logo-container">
-            <img src={logo} alt="MoundVision Analytics Logo" className="logo-img" />
-            <div>
-              <div className="brand-title">MOUNDVISION ANALYTICS</div>
-              <div className="tagline">Sharper vision. Better results.</div>
-            </div>
-          </div>
-        </div>
-        <div className="main-content">
-          <Routes>
-            <Route path="/" element={<Navigate to="/login" replace />} />
-            <Route path="/login" element={<Login />} />
-            <Route 
-              path="/dashboard" 
-              element={
-                <ProtectedRoute>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/login" element={<Login />} />
+          <Route 
+            path="/dashboard" 
+            element={
+              <ProtectedRoute>
+                <AuthenticatedApp>
                   <Dashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/upload" 
-              element={
-                <ProtectedRoute>
+                </AuthenticatedApp>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/upload" 
+            element={
+              <ProtectedRoute>
+                <AuthenticatedApp>
                   <UploadCSV />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/select-team" 
-              element={
-                <ProtectedRoute>
+                </AuthenticatedApp>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/select-team" 
+            element={
+              <ProtectedRoute>
+                <AuthenticatedApp>
                   <SelectTeam />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/select-pitcher" 
-              element={
-                <ProtectedRoute>
+                </AuthenticatedApp>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/select-pitcher" 
+            element={
+              <ProtectedRoute>
+                <AuthenticatedApp>
                   <SelectPitcher />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/report" 
-              element={
-                <ProtectedRoute>
+                </AuthenticatedApp>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/report" 
+            element={
+              <ProtectedRoute>
+                <AuthenticatedApp>
                   <ViewReport />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/best-of" 
-              element={
-                <ProtectedRoute>
+                </AuthenticatedApp>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/best-of" 
+            element={
+              <ProtectedRoute>
+                <AuthenticatedApp>
                   <BestOfStats />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/umpire-accuracy" 
-              element={
-                <ProtectedRoute>
+                </AuthenticatedApp>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/umpire-accuracy" 
+            element={
+              <ProtectedRoute>
+                <AuthenticatedApp>
                   <UmpireAccuracy />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/social-media-generator" 
-              element={
-                <ProtectedRoute>
+                </AuthenticatedApp>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/social-media-generator" 
+            element={
+              <ProtectedRoute>
+                <AuthenticatedApp>
                   <SocialMediaGenerator />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/admin" 
-              element={
-                <AdminRoute>
+                </AuthenticatedApp>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/roster" 
+            element={
+              <ProtectedRoute>
+                <AuthenticatedApp>
+                  <RosterManagement />
+                </AuthenticatedApp>
+              </ProtectedRoute>
+            } 
+          />
+                            <Route 
+                    path="/csv-management" 
+                    element={
+                      <ProtectedRoute>
+                        <AuthenticatedApp>
+                          <CSVManagement />
+                        </AuthenticatedApp>
+                      </ProtectedRoute>
+                    } 
+                  />
+                                      <Route 
+                      path="/calendar" 
+                      element={
+                        <ProtectedRoute>
+                          <AuthenticatedApp>
+                            <GameCalendar />
+                          </AuthenticatedApp>
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/game-report/:fileId" 
+                      element={
+                        <ProtectedRoute>
+                          <AuthenticatedApp>
+                            <GameReport />
+                          </AuthenticatedApp>
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/game-report/:fileId/pitcher/:pitcherName" 
+                      element={
+                        <ProtectedRoute>
+                          <AuthenticatedApp>
+                            <GameReport />
+                          </AuthenticatedApp>
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/player-profile/:playerName/:playerType" 
+                      element={
+                        <ProtectedRoute>
+                          <AuthenticatedApp>
+                            <PlayerProfile />
+                          </AuthenticatedApp>
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/development" 
+                      element={
+                        <ProtectedRoute>
+                          <AuthenticatedApp>
+                            <Development />
+                          </AuthenticatedApp>
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/metric-targets" 
+                      element={
+                        <ProtectedRoute>
+                          <AuthenticatedApp>
+                            <MetricTargets />
+                          </AuthenticatedApp>
+                        </ProtectedRoute>
+                      } 
+                    />
+          <Route 
+            path="/admin" 
+            element={
+              <AdminRoute>
+                <AuthenticatedApp>
                   <AdminPanel />
-                </AdminRoute>
-              } 
-            />
-          </Routes>
-        </div>
+                </AuthenticatedApp>
+              </AdminRoute>
+            } 
+          />
+        </Routes>
       </Router>
     </AuthProvider>
   );

@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import './Login.css';
 
 const Login = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -16,7 +16,7 @@ const Login = () => {
     setError('');
     setLoading(true);
 
-    const result = await login(username, password);
+    const result = await login(email, password);
     
     if (result.success) {
       navigate('/dashboard');
@@ -39,14 +39,14 @@ const Login = () => {
           {error && <div className="error-message">{error}</div>}
           
           <div className="form-group">
-            <label htmlFor="username">Username</label>
+            <label htmlFor="email">Email</label>
             <input
-              type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
-              placeholder="Enter your username"
+              placeholder="Enter your email"
             />
           </div>
           
@@ -72,9 +72,9 @@ const Login = () => {
         </form>
         
         <div className="login-footer">
-          <p>Need access? Contact Carson to request credentials or discuss a payment plan:</p>
+          <p>Need access? Contact us to request credentials or discuss a payment plan:</p>
           <p><strong>Phone:</strong> <a href="tel:19162509640">(916) 250-9640</a></p>
-          <p><strong>Email:</strong> <a href="mailto:carsonmorton3@gmail.com">carsonmorton3@gmail.com</a></p>
+          <p><strong>Email:</strong> <a href="mailto:cmorton@moundvision.com">cmorton@moundvision.com</a></p>
         </div>
       </div>
     </div>
