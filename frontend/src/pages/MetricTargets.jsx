@@ -4,7 +4,7 @@ import { API_BASE_URL } from '../config';
 import './MetricTargets.css';
 
 const MetricTargets = () => {
-    const { user } = useAuth();
+    const { user, token } = useAuth();
     const [targets, setTargets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -59,7 +59,7 @@ const MetricTargets = () => {
             setLoading(true);
             const response = await fetch(`${API_BASE_URL}/csv/metric-targets`, {
                 headers: {
-                    'Authorization': `Bearer ${user.token}`
+                    'Authorization': `Bearer ${token}`
                 }
             });
 
@@ -81,7 +81,7 @@ const MetricTargets = () => {
             const response = await fetch(`${API_BASE_URL}/csv/metric-targets`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${user.token}`
+                    'Authorization': `Bearer ${token}`
                 },
                 body: formData
             });
@@ -107,7 +107,7 @@ const MetricTargets = () => {
             const response = await fetch(`${API_BASE_URL}/csv/metric-targets/${targetId}`, {
                 method: 'DELETE',
                 headers: {
-                    'Authorization': `Bearer ${user.token}`
+                    'Authorization': `Bearer ${token}`
                 }
             });
 
@@ -130,7 +130,7 @@ const MetricTargets = () => {
             const response = await fetch(`${API_BASE_URL}/csv/metric-targets/reset-defaults`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${user.token}`
+                    'Authorization': `Bearer ${token}`
                 }
             });
 
